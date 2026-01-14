@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>슬기로운 연구생활</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #f9f9f9;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* 헤더 */
+        .header {
+            background: #fff;
+            border-bottom: 1px solid #e5e5e5;
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .header h1 {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+
+        .header .badge {
+            font-size: 11px;
+            background: #f0f0f0;
+            color: #666;
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+
+        /* 채팅 영역 */
+        .chat-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .chat-content {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        /* 메시지 */
+        .message {
+            margin-bottom: 24px;
+        }
+
+        .message.user {
+            background: #f7f7f7;
+            border-radius: 12px;
+            padding: 16px 20px;
+        }
+
+        .message.user .content {
+            color: #1a1a1a;
+            font-size: 15px;
+            line-height: 1.6;
+        }
+
+        .message.assistant {
+            padding: 16px 0;
+        }
+
+        .message.assistant .content {
+            color: #1a1a1a;
+            font-size: 15px;
+            line-height: 1.7;
+            white-space: pre-wrap;
+        }
+
+        /* N2B 분석 박스 */
+        .n2b-box {
+            background: #fff;
+            border: 1px solid #e5e5e5;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 16px 0;
+        }
+
+        .n2b-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #666;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .n2b-item {
+            margin-bottom: 14px;
+        }
+
+        .n2b-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .n2b-label {
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .n2b-label.not { color: #dc3545; }
+        .n2b-label.but { color: #28a745; }
+        .n2b-label.because { color: #007bff; }
+
+        .n2b-content {
+            font-size: 14px;
+            color: #333;
+            line-height: 1.5;
+            padding-left: 12px;
+            border-left: 3px solid #e5e5e5;
+        }
+
+        /* 제안 박스 */
+        .suggestion-box {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 16px;
+        }
+
+        .suggestion-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #666;
+            margin-bottom: 8px;
+        }
+
+        .suggestion-content {
+            font-size: 14px;
+            color: #333;
+            line-height: 1.5;
+        }
+
+        .next-action {
+            margin-top: 12px;
+            padding: 10px 14px;
+            background: #1a1a1a;
+            border-radius: 8px;
+            font-size: 14px;
+            color: white;
+        }
+
+        /* 버튼들 */
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 16px;
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            padding: 8px 16px;
+            border: 1px solid #e5e5e5;
+            background: #fff;
+            border-radius: 20px;
+            font-size: 13px;
+            color: #333;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .action-btn:hover {
+            background: #f5f5f5;
+            border-color: #ccc;
+        }
+
+        .action-btn.primary {
+            background: #1a1a1a;
+            color: white;
+            border-color: #1a1a1a;
+        }
+
+        .action-btn.primary:hover {
+            background: #333;
+        }
+
+        /* 입력 영역 */
+        .input-area {
+            background: #fff;
+            border-top: 1px solid #e5e5e5;
+            padding: 16px 20px;
+        }
+
+        .input-wrapper {
+            max-width: 800px;
+            margin: 0 auto;
+            display: flex;
+            align-items: flex-end;
+            gap: 12px;
+            background: #f7f7f7;
+            border-radius: 24px;
+            padding: 8px 8px 8px 20px;
+        }
+
+        .input-field {
+            flex: 1;
+            border: none;
+            background: transparent;
+            font-size: 15px;
+            padding: 8px 0;
+            outline: none;
+            resize: none;
+            font-family: inherit;
+            min-height: 24px;
+            max-height: 200px;
+        }
+
+        .input-field::placeholder {
+            color: #999;
+        }
+
+        .attach-btn {
+            width: 36px;
+            height: 36px;
+            border: none;
+            background: transparent;
+            color: #666;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            border-radius: 50%;
+            transition: background 0.2s;
+        }
+
+        .attach-btn:hover {
+            background: #e5e5e5;
+        }
+
+        .send-btn {
+            width: 36px;
+            height: 36px;
+            border: none;
+            background: #1a1a1a;
+            color: white;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            transition: background 0.2s;
+        }
+
+        .send-btn:hover {
+            background: #333;
+        }
+
+        .send-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        /* 샘플 버튼 */
+        .sample-buttons {
+            max-width: 800px;
+            margin: 0 auto 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+        }
+
+        .sample-btn {
+            padding: 8px 16px;
+            border: 1px solid #e5e5e5;
+            background: #fff;
+            border-radius: 20px;
+            font-size: 13px;
+            color: #555;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .sample-btn:hover {
+            background: #f5f5f5;
+            border-color: #ccc;
+        }
+
+        /* 파일 첨부 */
+        .file-input {
+            display: none;
+        }
+
+        .attached-file {
+            max-width: 800px;
+            margin: 0 auto 10px;
+            padding: 8px 12px;
+            background: #e8f4e8;
+            border-radius: 8px;
+            font-size: 13px;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .attached-file .remove {
+            cursor: pointer;
+            color: #666;
+        }
+
+        /* 타이핑 인디케이터 */
+        .typing {
+            display: flex;
+            gap: 4px;
+            padding: 20px 0;
+        }
+
+        .typing span {
+            width: 8px;
+            height: 8px;
+            background: #ccc;
+            border-radius: 50%;
+            animation: typing 1s infinite;
+        }
+
+        .typing span:nth-child(2) { animation-delay: 0.2s; }
+        .typing span:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes typing {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+
+        /* 다운로드 버튼 */
+        .download-btn {
+            margin-top: 12px;
+            padding: 8px 16px;
+            border: 1px solid #e5e5e5;
+            background: #fff;
+            border-radius: 8px;
+            font-size: 13px;
+            color: #666;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .download-btn:hover {
+            background: #f5f5f5;
+        }
+
+        /* 하단 정보 */
+        .footer-info {
+            text-align: center;
+            font-size: 12px;
+            color: #999;
+            padding: 8px;
+        }
+
+        /* 모바일 */
+        @media (max-width: 600px) {
+            .chat-content, .input-wrapper, .sample-buttons {
+                max-width: 100%;
+            }
+            
+            .input-wrapper {
+                border-radius: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🔬 슬기로운 연구생활</h1>
+        <span class="badge">N2B</span>
+    </div>
+
+    <div class="chat-container" id="chatContainer">
+        <div class="chat-content" id="chatContent">
+            <!-- 메시지들 -->
+        </div>
+    </div>
+
+    <div class="input-area">
+        <div id="attachedFileArea"></div>
+        <div class="sample-buttons" id="sampleButtons">
+            <button class="sample-btn" onclick="sendSample('논문이 안 써져요')">논문 작성</button>
+            <button class="sample-btn" onclick="sendSample('과제 수주가 안 돼요')">과제 수주</button>
+            <button class="sample-btn" onclick="sendSample('행정업무가 너무 많아요')">행정업무</button>
+            <button class="sample-btn" onclick="sendSample('주간보고서 작성을 도와주세요')">주간보고</button>
+            <button class="sample-btn" onclick="sendSample('연구 방향이 맞는지 모르겠습니다')">연구 방향</button>
+            <button class="sample-btn" onclick="sendSample('승진이나 급여 문제로 고민입니다')">승진급여</button>
+            <button class="sample-btn" onclick="sendSample('업무가 힘들어요')">업무고민</button>
+            <button class="sample-btn" onclick="sendSample('부서 전략이 어려워요')">부서전략</button>
+        </div>
+        <div class="input-wrapper">
+            <button class="attach-btn" onclick="document.getElementById('fileInput').click()">+</button>
+            <input type="file" id="fileInput" class="file-input" accept=".txt,.pdf,.doc,.docx,.hwp" onchange="handleFile(event)">
+            <input type="text" class="input-field" id="userInput" placeholder="연구 고민을 말씀해주세요..." onkeypress="handleKeyPress(event)">
+            <button class="send-btn" id="sendBtn" onclick="sendMessage()">↑</button>
+        </div>
+        <div class="footer-info">오늘 <span id="usageCount">0</span>/100회 사용 · + 파일 첨부 가능</div>
+    </div>
+
+    <script>
+        const API_URL = 'https://wise-research-life-api.onrender.com';
+        const chatContent = document.getElementById('chatContent');
+        const userInput = document.getElementById('userInput');
+        const sendBtn = document.getElementById('sendBtn');
+        const sampleButtons = document.getElementById('sampleButtons');
+        const usageCountEl = document.getElementById('usageCount');
+
+        let messages = [];
+        let isLoading = false;
+        let attachedFile = null;
+        let attachedContent = '';
+        let currentDepth = 0;
+        let lastN2BAnalysis = null;
+        let originalProblem = '';
+
+        // 초기화
+        function init() {
+            usageCountEl.textContent = getUsageCount();
+            addAssistantMessage(`안녕하세요! 😊
+
+연구고민, 업무고민 N2B로 정리해드려요. 무엇이든 말씀해 보세요!
+
+💡 N2B란? (가설검정의 논리구조)
+NOT(아니다) - BUT(진짜는) - BECAUSE(왜냐하면)
+표면적 원인을 부정하고, 진짜 원인을 찾아, 근거를 제시합니다.
+
+[연구/업무]
+💬 논문이 안 써집니다 → 원인 분석 | 🔍 과제를 찾고 있습니다 → 공고문 검색
+📚 참고문헌이 필요합니다 → 논문 검색 | 📝 주간보고서 작성 → 보고서 작성
+📓 연구노트 정리 → 노트 정리 | 📄 논문 초록 작성 → 초록 작성
+📋 연구제안서 검토 → 제안서 피드백 | 🔬 연구심의 도움 → 심의 핵심제공
+📊 연구 방향 점검 → 방향 점검 | 🧪 실험이 안 돼요 → 문제 진단
+📈 데이터 분석 어려움 → 방법 제안 | 🎤 학회 발표 준비 → 발표 전략
+📜 특허 출원 → 작성 가이드 | 🔄 기술이전 → 전략 제안
+
+[개인/생활]
+🎯 성과가 안 나와요 → 전략 제안 | 📈 승진이 안 됩니다 → 원인 분석
+😩 스트레스가 심해요 → 해소 방안 | 👥 대인관계 어려움 → 소통 개선
+🤝 공동연구자 갈등 → 관계 분석 | 😔 연구 의미 고민 → 동기 탐색
+📅 회의가 너무 많아요 → 시간 관리 | ⚖️ 워라밸이 안 맞아요 → 균형 전략
+🔥 번아웃이 왔어요 → 회복 방안 | 🚀 이직을 고민해요 → 방향 분석
+
+👆 위는 질문사례와 답변방향입니다.
+👇 아래 버튼을 클릭하면 바로 체험할 수 있어요!`);
+        }
+
+        // 사용량 관리
+        function getUsageCount() {
+            const today = new Date().toDateString();
+            const stored = localStorage.getItem('n2b_usage');
+            if (stored) {
+                const data = JSON.parse(stored);
+                if (data.date === today) return data.count;
+            }
+            return 0;
+        }
+
+        function incrementUsage() {
+            const today = new Date().toDateString();
+            const count = getUsageCount() + 1;
+            localStorage.setItem('n2b_usage', JSON.stringify({ date: today, count }));
+            usageCountEl.textContent = count;
+            return count;
+        }
+
+        function canUse() {
+            return getUsageCount() < 100;
+        }
+
+        // 파일 처리
+        function handleFile(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            attachedFile = file;
+            const reader = new FileReader();
+
+            if (file.type === 'application/pdf') {
+                reader.onload = (e) => {
+                    attachedContent = '[PDF 파일: ' + file.name + ']\n' + e.target.result.substring(0, 5000);
+                    showAttachedFile(file.name);
+                };
+                reader.readAsDataURL(file);
+            } else {
+                reader.onload = (e) => {
+                    attachedContent = e.target.result;
+                    showAttachedFile(file.name);
+                };
+                reader.readAsText(file);
+            }
+        }
+
+        function showAttachedFile(name) {
+            document.getElementById('attachedFileArea').innerHTML = `
+                <div class="attached-file">
+                    📄 ${name}
+                    <span class="remove" onclick="removeFile()">✕</span>
+                </div>
+            `;
+        }
+
+        function removeFile() {
+            attachedFile = null;
+            attachedContent = '';
+            document.getElementById('attachedFileArea').innerHTML = '';
+            document.getElementById('fileInput').value = '';
+        }
+
+        // 메시지 추가
+        function addUserMessage(text) {
+            const div = document.createElement('div');
+            div.className = 'message user';
+            div.innerHTML = `<div class="content">${escapeHtml(text)}</div>`;
+            chatContent.appendChild(div);
+            scrollToBottom();
+        }
+
+        function addAssistantMessage(text) {
+            const div = document.createElement('div');
+            div.className = 'message assistant';
+            div.innerHTML = `<div class="content">${escapeHtml(text)}</div>`;
+            chatContent.appendChild(div);
+            scrollToBottom();
+        }
+
+        function addN2BResponse(response, depth) {
+            const responseId = 'response_' + Date.now();
+            window[responseId] = response;
+
+            const div = document.createElement('div');
+            div.className = 'message assistant';
+            div.innerHTML = `
+                <div class="n2b-box">
+                    <div class="n2b-title">🔍 N2B 분석</div>
+                    <div class="n2b-item">
+                        <div class="n2b-label not">❌ NOT (아니다)</div>
+                        <div class="n2b-content">${escapeHtml(response.n2b.not)}</div>
+                    </div>
+                    <div class="n2b-item">
+                        <div class="n2b-label but">✓ BUT (진짜는)</div>
+                        <div class="n2b-content">${escapeHtml(response.n2b.but)}</div>
+                    </div>
+                    <div class="n2b-item">
+                        <div class="n2b-label because">💡 BECAUSE (왜냐하면)</div>
+                        <div class="n2b-content">${escapeHtml(response.n2b.because)}</div>
+                    </div>
+                </div>
+                <div class="suggestion-box">
+                    <div class="suggestion-title">🎯 이렇게 해보세요</div>
+                    <div class="suggestion-content">${escapeHtml(response.suggestion)}</div>
+                    ${response.nextAction ? `<div class="next-action">👉 ${escapeHtml(response.nextAction)}</div>` : ''}
+                </div>
+                <div class="action-buttons">
+                    <button class="action-btn primary" onclick="deepDive()">🌊 더 깊이 분석</button>
+                    <button class="action-btn" onclick="downloadResult('${responseId}')">📥 다운로드</button>
+                    <button class="action-btn" onclick="startNewTopic()">💬 새 고민</button>
+                </div>
+            `;
+            chatContent.appendChild(div);
+            scrollToBottom();
+        }
+
+        function showTyping() {
+            const div = document.createElement('div');
+            div.className = 'message assistant';
+            div.id = 'typingIndicator';
+            div.innerHTML = `<div class="typing"><span></span><span></span><span></span></div>`;
+            chatContent.appendChild(div);
+            scrollToBottom();
+        }
+
+        function hideTyping() {
+            const el = document.getElementById('typingIndicator');
+            if (el) el.remove();
+        }
+
+        function scrollToBottom() {
+            const container = document.getElementById('chatContainer');
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML.replace(/\n/g, '<br>');
+        }
+
+        // 메시지 전송
+        async function sendMessage() {
+            const text = userInput.value.trim();
+            if (!text || isLoading) return;
+
+            if (!canUse()) {
+                addAssistantMessage("오늘 사용량(100회)을 모두 소진했습니다.\n내일 다시 이용해주세요! 😊");
+                return;
+            }
+
+            // 첫 메시지면 샘플 버튼 숨기기
+            sampleButtons.style.display = 'none';
+
+            let fullText = text;
+            if (attachedContent) {
+                fullText = `[첨부 파일 내용]\n${attachedContent}\n\n[질문]\n${text}`;
+            }
+
+            addUserMessage(text);
+            userInput.value = '';
+            removeFile();
+
+            if (currentDepth === 0) {
+                originalProblem = text;
+            }
+
+            currentDepth = 1;
+            isLoading = true;
+            sendBtn.disabled = true;
+            showTyping();
+
+            try {
+                const response = await callClaudeAPI(fullText);
+                hideTyping();
+                incrementUsage();
+                lastN2BAnalysis = response;
+                addN2BResponse(response, currentDepth);
+            } catch (error) {
+                hideTyping();
+                addAssistantMessage("죄송합니다. 오류가 발생했습니다.\n잠시 후 다시 시도해주세요.");
+            }
+
+            isLoading = false;
+            sendBtn.disabled = false;
+            userInput.focus();
+        }
+
+        async function deepDive() {
+            if (isLoading || !lastN2BAnalysis) return;
+
+            currentDepth++;
+            isLoading = true;
+            sendBtn.disabled = true;
+            showTyping();
+
+            try {
+                const deepDivePrompt = `이전 분석에서 "${lastN2BAnalysis.n2b.but}"라고 했습니다.
+
+이것이 왜 진짜 원인인지 더 깊이 분석해주세요.
+이 원인의 더 근본적인 원인은 무엇인가요?
+
+반드시 아래 JSON 형식으로만 답변해주세요:
+{
+  "n2b": {
+    "not": "표면적 원인이 아니라",
+    "but": "더 근본적인 원인이다", 
+    "because": "왜냐하면 ~때문이다"
+  },
+  "suggestion": "구체적 제안",
+  "nextAction": "다음 행동을 ~해드리겠습니다"
+}`;
+
+                messages.push({ role: 'user', content: deepDivePrompt });
+
+                const deepSystem = `당신은 N2B 분석 전문가입니다. 반드시 지정된 JSON 형식으로만 답변하세요. JSON 외의 텍스트는 포함하지 마세요.`;
+
+                const response = await fetch(API_URL + '/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ system: deepSystem, messages: messages })
+                });
+
+                const data = await response.json();
+                const content = data.content;
+                messages.push({ role: 'assistant', content: content });
+
+                hideTyping();
+
+                try {
+                    const jsonMatch = content.match(/\{[\s\S]*\}/);
+                    if (jsonMatch) {
+                        const parsed = JSON.parse(jsonMatch[0]);
+                        lastN2BAnalysis = parsed;
+                        addN2BResponse(parsed, currentDepth);
+                    }
+                } catch (e) {
+                    addAssistantMessage(content);
+                }
+            } catch (error) {
+                hideTyping();
+                addAssistantMessage("죄송합니다. 오류가 발생했습니다.");
+            }
+
+            isLoading = false;
+            sendBtn.disabled = false;
+        }
+
+        async function callClaudeAPI(text) {
+            const systemPrompt = `당신은 '슬기로운 연구생활' 앱의 N2B 코치입니다.
+
+연구자의 고민을 듣고 N2B(NOT-BUT-BECAUSE) 프레임워크로 분석해주세요.
+
+## N2B 프레임워크
+- NOT (N): 문제가 ~이 아니라 (표면적/잘못된 원인 부정)
+- BUT (B): ~이다 (진짜 원인 제시)
+- BECAUSE (C): 왜냐하면 ~때문이다 (근거/논리적 설명)
+
+## 핵심 원리
+1. N2B는 비교판단입니다. 모든 판단은 비교판단이고, 논문의 결론도 비교판단입니다.
+
+2. 가설이 먼저입니다. 
+   - 먼저 N2B(가설)를 세우고 → 실험으로 증명
+   - 실험해서 결론을 찾는 게 아니라, 가설을 세우고 실험으로 설명/증명하는 것
+   - 코페르니쿠스: "지구가 중심이 아니라(N), 태양이 중심이다(B)" → 관측으로 증명
+
+3. 논문 결론 = 비교판단 = N2B
+   - "기존 연구는 A라고 했지만(NOT), 본 연구에서는 B임을 밝혔다(BUT), 왜냐하면 C이기 때문이다(BECAUSE)"
+
+## 능동지원 원칙
+분석만 하지 말고, 구체적인 행동을 제안하세요.
+제안 형식: "[목표]를 위해서는 [행동]을 해야 합니다"
+
+그리고 다음 행동을 능동적으로 제시하세요. "~드릴까요?"가 아니라 "~드리겠습니다"로.
+
+## 연구 라이프사이클 (순환)
+연구는 순환합니다:
+과제 수주 → 연구 수행 → 논문 작성 → 과제 수주 → ...
+
+한 단계가 끝나면 다음 단계를 제안하세요.
+끝이 아니라 새로운 시작입니다.
+
+## 응답 형식 (반드시 JSON으로)
+{
+  "n2b": {
+    "not": "~이 아니라",
+    "but": "~이다", 
+    "because": "~때문이다"
+  },
+  "suggestion": "[목표]를 위해서는 [행동]을 해야 합니다. 구체적 제안...",
+  "nextAction": "~해드리겠습니다"
+}`;
+
+            messages = [{ role: 'user', content: text }];
+
+            const response = await fetch(API_URL + '/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ system: systemPrompt, messages: messages })
+            });
+
+            const data = await response.json();
+            const content = data.content;
+            messages.push({ role: 'assistant', content: content });
+
+            try {
+                const jsonMatch = content.match(/\{[\s\S]*\}/);
+                if (jsonMatch) {
+                    return JSON.parse(jsonMatch[0]);
+                }
+            } catch (e) {}
+
+            return {
+                n2b: {
+                    not: "분석 중",
+                    but: "문제의 본질을 파악하는 중입니다",
+                    because: "조금 더 구체적인 상황을 알려주시면 정확한 분석이 가능합니다"
+                },
+                suggestion: content
+            };
+        }
+
+        function sendSample(text) {
+            userInput.value = text;
+            sendMessage();
+        }
+
+        function startNewTopic() {
+            currentDepth = 0;
+            lastN2BAnalysis = null;
+            originalProblem = '';
+            messages = [];
+            sampleButtons.style.display = 'flex';
+            addAssistantMessage("새로운 고민이 있으시면 말씀해주세요! 😊");
+            userInput.focus();
+        }
+
+        function downloadResult(responseId) {
+            const response = window[responseId];
+            if (!response) return;
+
+            const now = new Date();
+            const dateStr = now.toLocaleDateString('ko-KR');
+            const timeStr = now.toLocaleTimeString('ko-KR');
+
+            let content = `[슬기로운 연구생활 - N2B 분석 결과]\n`;
+            content += `생성일시: ${dateStr} ${timeStr}\n`;
+            content += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n`;
+            content += `[N2B 분석]\n`;
+            content += `❌ NOT (아니다):\n${response.n2b.not}\n\n`;
+            content += `✓ BUT (진짜는):\n${response.n2b.but}\n\n`;
+            content += `💡 BECAUSE (왜냐하면):\n${response.n2b.because}\n\n`;
+            content += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n`;
+            content += `[제안]\n${response.suggestion}\n`;
+            if (response.nextAction) {
+                content += `\n[다음 행동]\n${response.nextAction}\n`;
+            }
+
+            const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `N2B분석_${dateStr.replace(/\./g, '')}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        function handleKeyPress(e) {
+            if (e.key === 'Enter' && !isLoading) {
+                sendMessage();
+            }
+        }
+
+        init();
+    </script>
+</body>
+</html>
