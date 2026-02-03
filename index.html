@@ -336,6 +336,7 @@
         <h1>🏛️ 슬기로운 진흥원생활</h1>
         <span class="badge">N2B v2.0</span>
         <span class="status-dot" id="statusDot" title="백엔드 연결 확인 중..."></span>
+        <span style="font-size: 12px; color: #999; margin-left: 8px;" id="usageText"></span>
     </div>
 
     <div class="chat-container" id="chatContainer">
@@ -374,6 +375,22 @@
         let currentDepth = 0;
         let lastN2BAnalysis = null;
 
+        // ✅ 사용량 표시
+        function updateUsageDisplay(usage) {
+            if (!usage) return;
+            document.getElementById('usageText').textContent = `남은 ${usage.remaining}/${usage.limit}회`;
+        }
+
+        async function fetchUsage() {
+            try {
+                const resp = await fetch(`${BACKEND_URL}/api/usage`);
+                if (resp.ok) {
+                    const data = await resp.json();
+                    updateUsageDisplay(data.agency);
+                }
+            } catch (e) {}
+        }
+
         // ✅ 백엔드 헬스체크
         async function checkBackendHealth() {
             try {
@@ -391,6 +408,7 @@
 
         function init() {
             checkBackendHealth();
+            fetchUsage();
             addAssistantMessage(`안녕하세요! 😊
 
 진흥원 업무고민을 N2B로 정리해드려요. 무엇이든 말씀해 보세요!
@@ -520,12 +538,22 @@ NOT(아니다) - BUT(진짜는) - BECAUSE(왜냐하면)
                     body: JSON.stringify({ worry: text })
                 });
 
+                if (resp.status === 429) {
+                    const errData = await resp.json().catch(() => ({}));
+                    hideTyping();
+                    addAssistantMessage(`⚠️ ${errData.detail || '일일 사용 한도(100회)를 초과했습니다.'}\n내일 다시 이용해주세요.`);
+                    isLoading = false;
+                    sendBtn.disabled = false;
+                    return;
+                }
+
                 if (!resp.ok) {
                     const errData = await resp.json().catch(() => ({}));
                     throw new Error(errData.detail || `서버 오류 (${resp.status})`);
                 }
 
                 const data = await resp.json();
+                if (data.usage) updateUsageDisplay(data.usage);
                 hideTyping();
 
                 if (data.success && data.result) {
@@ -569,12 +597,22 @@ NOT(아니다) - BUT(진짜는) - BECAUSE(왜냐하면)
                     })
                 });
 
+                if (resp.status === 429) {
+                    const errData = await resp.json().catch(() => ({}));
+                    hideTyping();
+                    addAssistantMessage(`⚠️ ${errData.detail || '일일 사용 한도(100회)를 초과했습니다.'}\n내일 다시 이용해주세요.`);
+                    isLoading = false;
+                    sendBtn.disabled = false;
+                    return;
+                }
+
                 if (!resp.ok) {
                     const errData = await resp.json().catch(() => ({}));
                     throw new Error(errData.detail || `서버 오류 (${resp.status})`);
                 }
 
                 const data = await resp.json();
+                if (data.usage) updateUsageDisplay(data.usage);
                 hideTyping();
 
                 if (data.success && data.result) {
