@@ -1,1 +1,1 @@
-# wise-pro
+# wise-agency
